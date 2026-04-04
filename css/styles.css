@@ -60,7 +60,7 @@ body::after {
 /* Контейнер контента */
 .content {
     text-align: center;
-    max-width: 480px;
+    max-width: 680px;
     margin: 24px auto;
     background-color: rgba(0, 0, 0, 0.75);
     border-radius: 16px;
