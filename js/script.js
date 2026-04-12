@@ -104,12 +104,62 @@ function toggleRainbowMode() {
 
 
 window.addEventListener('load', () => {
-    document.querySelector('.content').style.opacity = '0';
-    document.querySelector('.content').style.transform = 'translateY(30px)';
-    
+    const content = document.querySelector('.content');
+    content.style.opacity = '0';
+    content.style.transform = 'translateY(30px)';
+
     setTimeout(() => {
-        document.querySelector('.content').style.transition = 'opacity 0.6s, transform 0.6s';
-        document.querySelector('.content').style.opacity = '1';
-        document.querySelector('.content').style.transform = 'translateY(0)';
+        content.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        content.style.opacity = '1';
+        content.style.transform = 'translateY(0)';
+
+        // Запускаем reveal блоков после появления контейнера
+        setTimeout(setupBlockReveal, 700);
     }, 100);
+});
+
+function setupBlockReveal() {
+    const blocks = [...document.querySelectorAll('.block')];
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const i = blocks.indexOf(entry.target);
+            entry.target.style.transitionDelay = `${Math.min(i * 60, 360)}ms`;
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.05 });
+
+    blocks.forEach(b => observer.observe(b));
+}
+
+// Курсорный след из частиц
+const sparkColors = ['#667eea', '#a78bfa', '#ff6b9d', '#ffd93d', '#6bcb77'];
+let lastSparkTime = 0;
+
+document.addEventListener('mousemove', (e) => {
+    const now = Date.now();
+    if (now - lastSparkTime < 40) return;
+    lastSparkTime = now;
+
+    const p = document.createElement('div');
+    p.className = 'cursor-particle';
+    const size = 3 + Math.random() * 5;
+    const color = sparkColors[Math.floor(Math.random() * sparkColors.length)];
+    const dy = -(12 + Math.random() * 22);
+
+    p.style.cssText = [
+        `left: ${e.clientX}px`,
+        `top: ${e.clientY}px`,
+        `width: ${size}px`,
+        `height: ${size}px`,
+        `background: ${color}`,
+        `box-shadow: 0 0 ${size + 3}px ${color}`,
+        `--dy: ${dy}px`,
+        `transform: translate(-50%, -50%)`,
+    ].join(';');
+
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 750);
 });

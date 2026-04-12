@@ -62,13 +62,23 @@ body::after {
     text-align: center;
     max-width: 680px;
     margin: 24px auto;
-    background-color: rgba(0, 0, 0, 0.75);
     border-radius: 16px;
-    border: 2px solid white;
+    border: 2px solid transparent;
     padding: 12px 48px 32px 48px;
     backdrop-filter: blur(5px);
     position: relative;
     z-index: 1;
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)) padding-box,
+        conic-gradient(
+            from var(--border-angle),
+            #667eea 0%,
+            #a78bfa 28%,
+            #ff6b9d 52%,
+            #ffd93d 76%,
+            #667eea 100%
+        ) border-box;
+    animation: border-spin 6s linear infinite;
 }
 
 /* Аватар */
@@ -76,7 +86,7 @@ body::after {
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    border: 3px solid #667eea;
+    border: 3px solid transparent;
     transition: transform 0.1s ease;
     cursor: pointer;
     margin: 20px 0;
@@ -278,6 +288,7 @@ td.a {
     text-decoration: none;
     cursor: pointer;
     position: relative;
+    overflow: hidden;
     transition: all 0.15s ease-out;
     box-shadow: 0 4px 0 rgba(102, 126, 234, 0.4);
 }
@@ -371,13 +382,185 @@ td.a {
         padding: 12px 24px 24px 24px;
         margin: 12px;
     }
-    
+
     #username {
         font-size: 22px;
     }
-    
+
     #avatar {
         width: 100px;
         height: 100px;
     }
+}
+
+/* ============================================================
+   ENHANCED ANIMATIONS
+   ============================================================ */
+
+/* CSS Houdini property для вращающегося бордера */
+@property --border-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+/* --- Keyframes --- */
+
+@keyframes border-spin {
+    to { --border-angle: 360deg; }
+}
+
+@keyframes avatar-glow {
+    0%, 100% {
+        box-shadow:
+            0 0 0 3px rgba(102, 126, 234, 0.6),
+            0 0 14px rgba(102, 126, 234, 0.35),
+            0 0 0 0 rgba(102, 126, 234, 0.2);
+        border-color: #667eea;
+    }
+    50% {
+        box-shadow:
+            0 0 0 3px rgba(167, 139, 250, 0.9),
+            0 0 30px rgba(102, 126, 234, 0.75),
+            0 0 0 12px rgba(102, 126, 234, 0);
+        border-color: #c084fc;
+    }
+}
+
+@keyframes title-glow {
+    0%, 100% {
+        border-left-color: #667eea;
+        filter: drop-shadow(-3px 0 6px rgba(102, 126, 234, 0.5));
+    }
+    50% {
+        border-left-color: #c084fc;
+        filter: drop-shadow(-3px 0 16px rgba(192, 132, 252, 1));
+    }
+}
+
+@keyframes badge-float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-5px); }
+}
+
+@keyframes icon-wobble {
+    0%, 100% { transform: scale(1.25) rotate(0deg); }
+    30%       { transform: scale(1.28) rotate(-13deg); }
+    70%       { transform: scale(1.28) rotate(13deg); }
+}
+
+@keyframes hr-shimmer {
+    from { background-position: 200% center; }
+    to   { background-position: -200% center; }
+}
+
+@keyframes particle-fade {
+    0%   { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0;   transform: translate(-50%, calc(-50% + var(--dy, -28px))) scale(0.1); }
+}
+
+/* --- Avatar pulse glow --- */
+#avatar {
+    animation: avatar-glow 3s ease-in-out infinite;
+}
+
+/* --- Block reveal: начальное состояние + visible --- */
+.block {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.block.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- Block title пульс --- */
+.block-title {
+    animation: title-glow 2.5s ease-in-out infinite;
+}
+
+/* --- Badge стаггерный флоат --- */
+.badge {
+    animation: badge-float 3s ease-in-out infinite;
+}
+
+.badge:nth-child(1) { animation-delay: 0.00s; }
+.badge:nth-child(2) { animation-delay: 0.25s; }
+.badge:nth-child(3) { animation-delay: 0.50s; }
+.badge:nth-child(4) { animation-delay: 0.75s; }
+.badge:nth-child(5) { animation-delay: 1.00s; }
+.badge:nth-child(6) { animation-delay: 1.25s; }
+.badge:nth-child(7) { animation-delay: 1.50s; }
+
+.badge:hover {
+    background: rgba(102, 126, 234, 0.3);
+    border-color: #667eea;
+    transform: translateY(-6px) scale(1.1);
+    box-shadow: 0 0 14px rgba(102, 126, 234, 0.7), 0 0 30px rgba(102, 126, 234, 0.2);
+    animation-play-state: paused;
+}
+
+/* --- Social icons wobble + glow --- */
+.social-icons img:hover {
+    animation: icon-wobble 0.45s ease infinite;
+    filter: brightness(1.35) drop-shadow(0 0 10px rgba(102, 126, 234, 0.95));
+    transform: none;
+}
+
+/* --- Button shimmer sweep --- */
+.button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -80%;
+    width: 55%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.14),
+        transparent
+    );
+    transition: left 0.5s ease;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.button:hover::after {
+    left: 160%;
+}
+
+/* --- HR shimmer --- */
+.fading-hr {
+    background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(102, 126, 234, 0.55) 25%,
+        #ffffff 50%,
+        rgba(102, 126, 234, 0.55) 75%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    background-size: 200% 100%;
+    background-position: 200% center;
+    animation: hr-shimmer 4s linear infinite;
+}
+
+/* --- Курсорный след из частиц --- */
+.cursor-particle {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    animation: particle-fade 0.7s ease-out forwards;
+}
+
+/* --- Highlight строк таблицы --- */
+.small-info tr {
+    transition: background 0.2s ease;
+}
+
+.small-info tr:hover td {
+    background: rgba(102, 126, 234, 0.07);
 }
