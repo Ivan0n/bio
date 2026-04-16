@@ -135,7 +135,7 @@ function setupBlockReveal() {
 }
 
 // Курсорный след из частиц
-const sparkColors = ['#667eea', '#a78bfa', '#ff6b9d', '#ffd93d', '#6bcb77'];
+const sparkColors = ['#8b5cf6', '#a78bfa', '#c084fc', '#e879f9', '#ddd6fe'];
 let lastSparkTime = 0;
 
 document.addEventListener('mousemove', (e) => {
